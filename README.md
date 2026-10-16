@@ -1,12 +1,7 @@
 # Decoy
 
-Fake your iPhone's location from your Mac. Click a map, your phone goes there, and Find My
+Spoof your iPhone's location from your Mac. Click a map, your phone goes there, and Find My
 believes it. Made by slizsy.
-
-Built for pranking friends. It runs on your computer and talks to your phone over USB, using
-Apple's own developer location tools, so apps like Find My, Maps, and Weather all see the fake spot.
-
-Tested on an iPhone 15 running iOS 26 with a Mac. Windows is planned.
 
 ## Features
 
@@ -33,7 +28,7 @@ Tested on an iPhone 15 running iOS 26 with a Mac. Windows is planned.
 ## Run from source
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/decoy.git
+git clone https://github.com/slizsy/decoy.git
 cd decoy
 python3 -m venv venv
 source venv/bin/activate
