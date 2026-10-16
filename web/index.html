@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="signal">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Decoy</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="splash" class="splash" aria-hidden="true">
+    <div class="sp-stage">
+      <span class="sp-ring"></span><span class="sp-ring"></span><span class="sp-ring"></span>
+      <img class="sp-icon" src="icon.png" alt="" />
+    </div>
+    <h1 class="sp-title" id="sp-title">Welcome to Decoy</h1>
+    <p class="sp-by">made by slizsy</p>
+  </div>
+
+  <div id="map"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="search">
+      <svg class="search-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search" type="text" placeholder="Jump to a place" autocomplete="off" spellcheck="false" />
+      <div id="results" class="results"></div>
+    </div>
+    <button id="conn" class="conn" title="Connection">
+      <span class="dot"></span>
+      <span id="conn-text" class="conn-text">Checking device</span>
+    </button>
+  </header>
+
+  <aside id="console" class="console">
+    <div class="brand">
+      <img class="mark" src="icon.png" alt="" />
+      <span class="name">Decoy</span>
+      <button id="collapse" class="collapse" title="Hide panel" aria-label="Hide panel">‹</button>
+    </div>
+
+    <nav class="tabs">
+      <button class="tab is-active" data-tab="position">Position</button>
+      <button class="tab" data-tab="spots">Spots</button>
+      <button class="tab" data-tab="travel">Travel</button>
+      <button class="tab" data-tab="logs">Logs</button>
+    </nav>
+
+    <div class="pane-wrap">
+      <section class="pane is-active" data-pane="position">
+        <p class="hint">Tap the map to drop your decoy, or search above.</p>
+        <div class="coord-card">
+          <div class="coord-row"><span class="coord-k">lat</span><span id="cur-lat" class="coord-v">—</span></div>
+          <div class="coord-row"><span class="coord-k">lon</span><span id="cur-lon" class="coord-v">—</span></div>
+        </div>
+
+        <div class="field-label">Enter coordinates</div>
+        <div class="coord-input">
+          <input id="in-lat" inputmode="decimal" placeholder="lat" spellcheck="false" />
+          <input id="in-lon" inputmode="decimal" placeholder="lon" spellcheck="false" />
+          <button id="go-coord" class="btn mini">Go</button>
+        </div>
+
+        <label class="toggle-row" for="jitter">
+          <span class="tr-label">GPS drift<span class="sub">wobble like a real signal</span></span>
+          <span class="switch"><input type="checkbox" id="jitter" /><span class="track"></span></span>
+        </label>
+
+        <label class="toggle-row" for="tunnel-svc">
+          <span class="tr-label">Start tunnel at boot<span class="sub">enter your password once, never again</span></span>
+          <span class="switch"><input type="checkbox" id="tunnel-svc" /><span class="track"></span></span>
+        </label>
+
+        <div class="actions">
+          <button id="copy-cur" class="btn ghost" disabled>Copy coordinates</button>
+          <button id="save-cur" class="btn ghost" disabled>Save this spot</button>
+          <button id="restore" class="btn warn" disabled>Restore real GPS</button>
+        </div>
+      </section>
+
+      <section class="pane" data-pane="spots">
+        <div id="spot-list" class="spot-list"></div>
+      </section>
+
+      <section class="pane" data-pane="travel">
+        <p class="hint">Tap the map to lay down a route, then move along it at a believable pace.</p>
+        <div class="segmented" id="speed">
+          <button data-mode="walk" class="is-active">Walk</button>
+          <button data-mode="run">Run</button>
+          <button data-mode="bike">Bike</button>
+          <button data-mode="drive">Drive</button>
+        </div>
+        <div class="route-meta">
+          <span id="route-pts">0 points</span>
+          <button id="route-clear" class="link">Clear route</button>
+        </div>
+        <div class="progress"><div id="progress-fill" class="progress-fill"></div></div>
+        <div class="actions">
+          <button id="travel-go" class="btn primary" disabled>Start moving</button>
+          <button id="travel-stop" class="btn ghost" disabled>Stop</button>
+        </div>
+      </section>
+
+      <section class="pane" data-pane="logs">
+        <div class="log-head">
+          <span class="field-label" style="margin:0">Live log</span>
+          <div class="log-actions">
+            <button id="log-copy" class="link">Copy</button>
+            <button id="log-clear" class="link">Clear</button>
+          </div>
+        </div>
+        <div id="log-body" class="log-body"></div>
+      </section>
+    </div>
+
+    <div class="theme-bar" id="theme-bar">
+      <span class="tb-label">Theme</span>
+      <button class="swatch" data-theme="signal"  title="Signal"   style="--sw:#ff5c4d"></button>
+      <button class="swatch" data-theme="midnight" title="Midnight" style="--sw:#8b5cf6"></button>
+      <button class="swatch" data-theme="terminal" title="Terminal" style="--sw:#2bd957"></button>
+      <button class="swatch" data-theme="mono"     title="Mono"     style="--sw:#e8a33d"></button>
+      <button class="swatch" data-theme="light"    title="Daylight" style="--sw:#dfe3ea"></button>
+    </div>
+  </aside>
+
+  <button id="reveal" class="reveal" title="Show panel" aria-label="Show panel">›</button>
+  <button id="recenter" class="recenter" title="Center on decoy" aria-label="Center on decoy">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+  </button>
+
+  <div class="telemetry">
+    <span class="tele-dot" id="tele-dot"></span>
+    <span class="tele-label" id="tele-label">Idle</span>
+    <span class="tele-sep"></span>
+    <span class="tele-coord"><span id="tele-lat">--.----</span>, <span id="tele-lon">--.----</span></span>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
