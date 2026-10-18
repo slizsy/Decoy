@@ -1,7 +1,10 @@
 # Decoy
 
-Spoof your iPhone's location from your Mac. Click a map, your phone goes there, and Find My
-believes it. Made by slizsy.
+Spoof your iPhone's location from your Mac or Windows PC. Click a map, your phone goes there,
+and Find My believes it. Made by slizsy.
+
+Mac is the most tested. Windows works from source and has a build script for a single `.exe`,
+but it's newer and has had less testing.
 
 ## Features
 
@@ -12,20 +15,39 @@ believes it. Made by slizsy.
 - Five themes (Signal, Midnight, Terminal, Mono, Daylight)
 - Live Logs tab that shows Python errors, tunnel errors, and every call the UI makes
 - Optional background service so you enter your password once, not on every connect
+  (a launchd service on Mac, a Scheduled Task on Windows)
 
 ## Requirements
+
+### Mac
 
 - A Mac
 - An iPhone on iOS 17 or newer, with a USB cable
 - Python 3.9 or newer (only if running from source)
 
+### Windows
+
+- Windows 10 or 11
+- An iPhone on iOS 17 or newer, with a USB cable
+- The **Apple Devices** app from the Microsoft Store (or iTunes from apple.com). This installs
+  Apple's USB service. Without it, Windows can't see the phone at all.
+- Python **3.12 or 3.13** (only if running from source). Newer versions (3.14 and up) don't have
+  prebuilt packages for everything yet, so pip tries to compile them and fails without
+  Microsoft's C++ build tools.
+
 ## One-time phone setup
 
-1. Plug the iPhone into the Mac.
+1. Plug the iPhone into the computer.
+   - On Windows, open the **Apple Devices** app first. The Trust prompt appears once the
+     phone is plugged in and unlocked.
 2. On the phone: Settings > Privacy & Security > Developer Mode > on, then restart.
+   - If the Developer Mode switch isn't there, run
+     `python -m pymobiledevice3 amfi reveal-developer-mode` and check again.
 3. Unlock it and tap **Trust**. The first connect also shows a pairing prompt. Tap **Allow**.
 
 ## Run from source
+
+### Mac
 
 ```bash
 git clone https://github.com/slizsy/decoy.git
@@ -40,73 +62,11 @@ python main.py
 Click the status chip in the top right to connect. The first connect asks for your Mac
 password to start the tunnel (see below).
 
-## Build the Mac app
+### Windows
 
-```bash
-source venv/bin/activate
-./build_mac.sh
-```
+In Command Prompt:
 
-This makes `dist/Decoy.app` with the app icon. Drag it into Applications.
-
-You can also build it in the cloud: on GitHub, go to Actions, pick **Build Mac app**, and
-click **Run workflow**. The finished zip appears under Artifacts. An app downloaded this way
-needs a right-click > Open the first time, because it isn't signed with a paid Apple certificate.
-
-## The tunnel
-
-iOS 17 and newer only allow location control through a background tunnel that runs as
-admin. Decoy starts it for you.
-
-To skip the password prompt on every connect, flip **Start tunnel at boot** in the Position tab.
-It asks for your password once and installs a background service that starts with your Mac.
-Flip it off to remove the service.
-
-If you move or rename `Decoy.app`, flip the toggle off and on again so the service points
-at the new location.
-
-## Troubleshooting
-
-Open the **Logs** tab first. It shows the actual error.
-
-- **"no iphone found":** unlock the phone and look for a Trust or pairing prompt on its screen.
-- **"tunnel didn't come up":** the Logs tab prints the tunnel's own log. Check that nothing
-  else is using port 49151.
-- **Map is blank:** the map loads from the internet. Check your connection.
-- **Device library error:** the Logs tab shows the import error. Usually a missing or
-  mismatched `pymobiledevice3` install.
-
-## Project layout
-
-```
-main.py        entry point (also runs the tunnel when started with --tunneld)
-device.py      phone connection and the tunnel service
-api.py         bridge between the UI and Python
-geo.py         distance and route math
-store.py       saved spots
-logbuf.py      log capture for the Logs tab
-web/           the interface (HTML, CSS, JS)
-assets/        app icons (Decoy.icns for Mac, Decoy.ico for Windows)
-build_mac.sh   builds Decoy.app
-```
-
-## Roadmap
-
-- Windows build (`.exe`)
-
-## Disclaimer
-
-For fun and for pranks between friends who are in on it. Don't use it to deceive people in
-ways that could hurt them, to get around rules, or to fake your whereabouts somewhere it matters.
-You're responsible for how you use it. Not affiliated with Apple.
-
-## Credits
-
-- [pymobiledevice3](https://github.com/doronz88/pymobiledevice3) talks to the iPhone
-- [pywebview](https://pywebview.flowrl.com/) provides the native window
-- [Leaflet](https://leafletjs.com/) and [OpenStreetMap](https://www.openstreetmap.org/copyright) power the map
-- [Space Grotesk](https://fonts.google.com/specimen/Space+Grotesk) and [JetBrains Mono](https://www.jetbrains.com/lp/mono/) for type
-
-## License
-
-GPL-3.0, see [LICENSE](LICENSE). pymobiledevice3 is GPL-3.0, so Decoy is too.
+```bat
+git clone https://github.com/slizsy/decoy.git
+cd decoy
+py -3
