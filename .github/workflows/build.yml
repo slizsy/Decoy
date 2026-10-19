@@ -1,0 +1,89 @@
+name: Build apps
+
+# click "Run workflow" on the Actions tab to build both apps, or push a tag
+# like v1.0 to also attach them to a GitHub Release.
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  macos:
+    name: Build Mac app
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+
+      - name: Build Decoy.app
+        run: |
+          pyinstaller --noconfirm --clean --windowed \
+            --name Decoy \
+            --icon assets/Decoy.icns \
+            --osx-bundle-identifier com.decoy.app \
+            --add-data "web:web" \
+            --collect-all pymobiledevice3 \
+            --copy-metadata pymobiledevice3 \
+            main.py
+
+      - name: Zip the .app (ditto keeps the bundle intact)
+        run: ditto -c -k --keepParent dist/Decoy.app dist/Decoy-macos.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Decoy-macos
+          path: dist/Decoy-macos.zip
+
+      - name: Attach to release (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/Decoy-macos.zip
+
+  windows:
+    name: Build Windows exe
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+
+      - name: Build Decoy.exe
+        run: >
+          pyinstaller --noconfirm --clean --windowed --onefile
+          --name Decoy
+          --icon assets/Decoy.ico
+          --add-data "web;web"
+          --collect-all pymobiledevice3
+          --copy-metadata pymobiledevice3
+          main.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Decoy-windows
+          path: dist/Decoy.exe
+
+      - name: Attach to release (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/Decoy.exe
+
+permissions:
+  contents: write
