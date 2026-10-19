@@ -145,12 +145,6 @@ assets/                     app icons (Decoy.icns for Mac, Decoy.ico for Windows
 .github/workflows/build.yml builds the Mac app and Windows exe on GitHub's runners
 ```
 
-## Disclaimer
-
-For fun and for pranks between friends who are in on it. Don't use it to deceive people in ways
-that could hurt them, to get around rules, or to fake your whereabouts somewhere it matters.
-You're responsible for how you use it. Not affiliated with Apple.
-
 ## Credits
 
 - [pymobiledevice3](https://github.com/doronz88/pymobiledevice3) talks to the iPhone
