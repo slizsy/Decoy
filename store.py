@@ -1,13 +1,23 @@
-"""saved spots live in ~/Library/Application Support/Decoy/spots.json"""
+"""saved spots live in the per-user app-data folder (differs by OS)."""
 
 import json
 import os
+import sys
 import uuid
 from pathlib import Path
 
 
 def _data_dir():
-    base = Path.home() / "Library" / "Application Support" / "Decoy"
+    # each OS has its own "right" place for this kind of thing
+    if sys.platform == "win32":
+        root = Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming"))
+        base = root / "Decoy"
+    elif sys.platform == "darwin":
+        base = Path.home() / "Library" / "Application Support" / "Decoy"
+    else:
+        # linux / anything else - follow XDG if it's set
+        root = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share"))
+        base = root / "Decoy"
     base.mkdir(parents=True, exist_ok=True)
     return base
 

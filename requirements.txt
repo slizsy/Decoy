@@ -1,2 +1,6 @@
 pywebview>=5.0
 pymobiledevice3>=11.0
+
+# pywebview needs a native backend per-OS; plain pip install doesn't pull these
+pyobjc-framework-WebKit>=9 ; sys_platform == "darwin"
+pythonnet>=3.0 ; sys_platform == "win32"

@@ -1,0 +1,27 @@
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.Python
+
+# venvs
+venv/
+.venv/
+env/
+
+# pyinstaller build output
+build/
+dist/
+*.spec
+
+# app data / logs that might land here during dev
+*.log
+spots.json
+
+# os junk
+.DS_Store
+Thumbs.db
+
+# editors
+.vscode/
+.idea/
